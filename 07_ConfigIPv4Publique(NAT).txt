@@ -1,0 +1,38 @@
+7. ACTIVER ET CONFIGURER LA CONNECTIVITE IPv4 PUBLIQUE
+
+%Uniquement sur R1
+%Activer interface externe de R1
+R1(config)#int g0/1
+R1(config-if)#ip address dhcp
+R1(config-if)#no shu
+
+%Créer une ACL pour toutes les LANs
+R1(config)#access-list 1 permit 192.168.1.0 0.0.0.255
+R1(config)#access-list 1 permit 192.168.33.0 0.0.0.255
+R1(config)#access-list 1 permit 192.168.65.0 0.0.0.255
+R1(config)#ip nat inside source list 1 interface g0/1 overload
+
+%Indiquer chaque interface qui choisit le trafic à traduire inside/outside
+R1(config-if)#int g0/0
+R1(config-if)#ip nat inside
+R1(config)#int g0/2
+R1(config-if)#ip nat inside
+R1(config-if)#exit
+R1(config)#int g0/3
+R1(config-if)#ip nat inside
+R1(config-if)#exit
+R1(config)#int g0/1
+R1(config-if)#ip nat outside
+R1(config-if)#exit
+
+%Pour transmettre la route par défaut aux autres routeurs
+R1(config)#router ospf 1
+R1(config-router)#default-information originate
+
+%Test ping 8.8.8.8 depuis les différents terminaux OK
+
+%Diagnostiques
+R1#show access-lists
+R1#show running-config | include nat
+R1#show ip nat translations
+R1#show ip nat statistics

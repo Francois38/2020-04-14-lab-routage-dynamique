@@ -1,0 +1,36 @@
+3. ACTIVER dhcp POUR IPv4
+
+%Sur R1, création des pools dhcp, exclusion plages d'adresses
+R1(config)#ip dhcp pool LANR1
+R1(dhcp-config)#network 192.168.1.0 255.255.255.0
+R1(dhcp-config)#default-router 192.168.1.254
+R1(dhcp-config)#dns-server 1.1.1.1
+R1(dhcp-config)#lease 0 8
+
+R1(config)#ip dhcp pool LANR2
+R1(dhcp-config)#network 192.168.33.0 255.255.255.0
+R1(dhcp-config)#default-router 192.168.33.254
+R1(dhcp-config)#dns-server 1.1.1.1
+R1(dhcp-config)#lease 0 8
+
+R1(config)#ip dhcp pool LANR3
+R1(dhcp-config)#network 192.168.65.0 255.255.255.0
+R1(dhcp-config)#default-router 192.168.65.254
+R1(dhcp-config)#dns-server 1.1.1.1
+R1(dhcp-config)#lease 0 8
+R1(dhcp-config)#exit
+
+%Exclusion de plage d'adresses sur R1
+R1(config)#ip dhcp excluded-address 192.168.1.1 192.168.1.99
+R1(config)#ip dhcp excluded-address 192.168.33.1 192.168.33.99
+R1(config)#ip dhcp excluded-address 192.168.65.1 192.168.65.99
+
+%Sur R2 et R3 activation du DHCP relay via R1 sur int 192.168.1.254
+R3(config)#int g0/0
+R3(config-if)#ip helper-address 192.168.1.254
+
+%Diagnostiques
+R1#sh run | begin ip dhcp
+R1#sh ip dhcp binding
+R1#sh ip dhcp pool LANR1
+R1#sh ip dhcp server statistics

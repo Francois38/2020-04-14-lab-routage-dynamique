@@ -1,0 +1,50 @@
+4. CONFIGURER ET ACTIVER LE ROUTAGE ospfV2
+
+%Sur chaque routeur configuration routage OSPFv2
+R1(config)#router ospf 1
+R1(config-router)#router-id 1.1.1.1
+R1(config-router)#passive-interface g0/0
+R1(config-router)#network 192.168.1.254 0.0.0.0 area 0
+R1(config-router)#network 192.168.225.1 0.0.0.0 area 0
+R1(config-router)#network 192.168.226.1 0.0.0.0 area 0
+R1(config-router)#auto-cost reference-bandwidth 1000
+R1(config-router)#end
+R1#wr
+
+R2(config)#router ospf 1
+R2(config-router)#router-id 2.2.2.2
+R2(config-router)#passive-interface g0/0
+R2(config-router)#network 192.168.33.254 0.0.0.0 area 0
+R2(config-router)#network 192.168.225.2 0.0.0.0 area 0
+R2(config-router)#network 192.168.227.2 0.0.0.0 area 0
+R2(config-router)#auto-cost reference-bandwidth 1000
+R2(config-router)#end
+R2#wr
+
+R3(config)#router ospf 1
+R3(config-router)#router-id 3.3.3.3
+R3(config-router)#passive-interface g0/0
+R3(config-router)#network 192.168.65.254 0.0.0.0 area 0
+R3(config-router)#network 192.168.226.3 0.0.0.0 area 0
+R3(config-router)#network 192.168.227.3 0.0.0.0 area 0
+R3(config-router)#auto-cost reference-bandwidth 1000
+R3(config-router)#end
+R3#wr
+
+%Sur R1 pour qu'il devienne DR
+R1(config)#int g0/2
+R1(config-if)#ip ospf priority 255
+R1(config)#int g0/3
+R1(config-if)#ip ospf priority 255
+R1(config-if)#end
+R1#wr
+
+%Diagnostiques
+R1#sh ip route
+R1#sh ipv6 route
+R1#sh ip ospf neighbor
+R1#sh ip protocols
+R1#sh ip protocols | begin ospf 1
+R1#sh ipv6 protocols
+R1#sh ip ospf rib
+

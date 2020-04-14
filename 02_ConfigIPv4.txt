@@ -1,0 +1,94 @@
+2. Vérifier, activer et configurer les interfaces IPv4
+
+R1#show ip interface brief
+Interface                  IP-Address      OK? Method Status                Protocol
+GigabitEthernet0/0         unassigned      YES unset  administratively down down
+GigabitEthernet0/1         unassigned      YES unset  administratively down down
+GigabitEthernet0/2         unassigned      YES unset  administratively down down
+GigabitEthernet0/3         unassigned      YES unset  administratively down down
+GigabitEthernet0/4         unassigned      YES unset  administratively down down
+GigabitEthernet0/5         unassigned      YES unset  administratively down down
+GigabitEthernet0/6         unassigned      YES unset  administratively down down
+GigabitEthernet0/7         unassigned      YES unset  administratively down down
+
+% Configuration IPv4 R1
+R1(config)#int g0/0
+R1(config-if)#ip address 192.168.1.254 255.255.255.0
+R1(config-if)#no shut
+R1(config)#int g0/3
+R1(config-if)#no shu
+R1(config-if)#ip add 192.168.226.1 255.255.255.0
+R1(config)#int g0/2
+R1(config-if)#ip address 192.168.225.1 255.255.255.0
+R1(config-if)#no shut
+
+R1#show ip int brie
+Interface                  IP-Address      OK? Method Status                Protocol
+GigabitEthernet0/0         192.168.1.254   YES manual up                    up  
+GigabitEthernet0/1         unassigned      YES unset  up                    up  
+GigabitEthernet0/2         192.168.225.1   YES manual up                    up  
+GigabitEthernet0/3         192.168.226.1   YES manual up                    up  
+GigabitEthernet0/4         unassigned      YES unset  administratively down down
+GigabitEthernet0/5         unassigned      YES unset  administratively down down
+GigabitEthernet0/6         unassigned      YES unset  administratively down down
+GigabitEthernet0/7         unassigned      YES unset  administratively down down
+
+%Status up --> couche 1 OK
+% Protocol up --> couche 2 OK
+% Test ping depuis R1 vers R2 (ou R3) pour la couche 3 OK
+
+% Configuration IPv4 R2
+R2(config)#int g0/0
+R2(config-if)#no shu
+R2(config-if)#ip add 192.168.33.254 255.255.255.0
+R2(config)#int g0/1
+R2(config-if)#no shu
+R2(config-if)#ip add 192.168.225.2 255.255.255.0
+R2(config)#int g0/3
+R2(config-if)#no shu
+R2(config-if)#ip add 192.168.227.2 255.255.255.0
+
+% Configuration IPv4 R3
+R3(config)#int g0/0
+R3(config-if)#no shu
+R3(config-if)#ip add 192.168.65.254 255.255.255.0
+R3(config-if)#exit
+R3(config)#int g0/1
+R3(config-if)#no shu
+R3(config-if)#ip add 192.168.226.3 255.255.255.0
+R3(config-if)#exit
+R3(config)#int g0/2
+R3(config-if)#no shu
+R3(config-if)#ip add 192.168.227.3 255.255.255.0
+
+R3#show ip int brie
+Interface                  IP-Address      OK? Method Status                Protocol
+GigabitEthernet0/0         192.168.65.254  YES manual up                    up  
+GigabitEthernet0/1         192.168.226.3   YES manual up                    up  
+GigabitEthernet0/2         192.168.227.3   YES manual up                    up  
+GigabitEthernet0/3         unassigned      YES unset  administratively down down
+GigabitEthernet0/4         unassigned      YES unset  administratively down down
+GigabitEthernet0/5         unassigned      YES unset  administratively down down
+GigabitEthernet0/6         unassigned      YES unset  administratively down down
+GigabitEthernet0/7         unassigned      YES unset  administratively down down
+
+
+%Sur tous les routeurs activer le CDP
+R3#cdp run
+R3#show cdp
+R3#sh cdp neighb
+Capability Codes: R - Router, T - Trans Bridge, B - Source Route Bridge
+                  S - Switch, H - Host, I - IGMP, r - Repeater, P - Phone,
+                  D - Remote, C - CVTA, M - Two-port Mac Relay
+
+Device ID        Local Intrfce     Holdtme    Capability  Platform  Port ID
+R2.lan           Gig 0/2           164              R B             Gig 0/3
+R1.lan           Gig 0/1           165              R B             Gig 0/3
+
+Total cdp entries displayed : 2
+
+%Sur R1 désactiver le CDP vers Internet:
+R1(config)#cdp run
+R1(config)#int g0/1
+R1(config-if)#no cdp enable
+R3(config-if)#exit

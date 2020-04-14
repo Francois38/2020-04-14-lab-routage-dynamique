@@ -1,0 +1,14 @@
+
+1. CONFIGURER GLOBALEMENT LES ROUTEURS
+
+% Sur R1
+#conf t
+(config)#hostname R1
+(config)#ip domain-name lan
+(config)#enable secret testtest
+(config)#username root secret testtest
+(config)#crypto key generate rsa	% 2048 bits modulus
+(config)#line vty 0 4
+(config-line)#ip ssh version 2
+R1(config-line)#transport input ssh
+R1(config-line)#login local
